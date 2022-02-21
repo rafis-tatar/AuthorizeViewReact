@@ -1,9 +1,7 @@
-import React, { Suspense } from 'react'
 import First from '../Pages/First/First';
-import Login from '../Pages/Login/login';
+import Login from '../Pages/Login';
 import Main from '../Pages/Main/Main';
 import Second from '../Pages/Second/Second';
-import { IRoutingsProp } from './Routings';
 
 const routes = {
   autorized : [

@@ -1,10 +1,10 @@
 import React from 'react';
-import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom'
+import {BrowserRouter as Router} from 'react-router-dom'
 import AutorizedView from './Components/AuthView/AuthorizedView';
 import AuthView from './Components/AuthView/AuthView';
 import NonAutorizedView from './Components/AuthView/NonAutorizedView';
 import Menu from './Components/MenuComponent/Menu';
-import Login from './Pages/Login/login';
+import Login from './Pages/Login';
 import Routings from './Routing/Routings';
 import routes from './Routing/routs';
 

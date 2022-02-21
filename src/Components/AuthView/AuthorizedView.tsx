@@ -1,24 +1,34 @@
-import * as React from 'react';
+import { FC, ReactChild } from 'react';
 
 interface IAuthorizedProps 
 {
     children?:
-    | React.ReactChild
-    | React.ReactChild[];
+    | ReactChild
+    | ReactChild[];
 } 
-interface IAuthorizedState
-{
-       
-} 
-class AutorizedView extends React.Component<IAuthorizedProps,IAuthorizedState> {
-    constructor(props: IAuthorizedProps) {
-        super(props);
-        this.state = {};
-    }
-    render() { 
-        return(<>{this.props.children}</>);
-    }
+// interface IAuthorizedState
+// { 
+
+// } 
+
+const AutorizedView : FC<IAuthorizedProps> = ({ children } : IAuthorizedProps) => {
+
+  return (
+    <div>
+      { children }
+    </div>
+  )
 }
+
+// class AutorizedView extends React.Component<IAuthorizedProps,IAuthorizedState> {
+//     constructor(props: IAuthorizedProps) {
+//         super(props);
+//         this.state = {};
+//     }
+//     render() { 
+//         return(<>{this.props.children}</>);
+//     }
+// }
  
 
 

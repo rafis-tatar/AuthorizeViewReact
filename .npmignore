@@ -1,0 +1,14 @@
+src/Pages/First/
+src/Pages/Main
+src/Pages/Second
+src/Routing/routs.tsx
+src/App.tsx
+src/logo.svg
+src/index.tsx
+src/reportWebVitals.ts
+src/setupTests.ts
+public/
+.vscode/
+.editorconfig
+.tsconfig.json
+react-app-env.d.ts
