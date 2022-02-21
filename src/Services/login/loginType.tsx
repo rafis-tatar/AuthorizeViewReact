@@ -1,5 +1,5 @@
 export default interface loginType{
-        Login: string;//":"GataullinRA@ec.tatneft.ru",
-        Password : string;//"123edcCDE#@!",
-        IsDomainAccount: boolean;//: true     
+        Login: string;
+        Password : string;
+        IsDomainAccount: Boolean;
     }
