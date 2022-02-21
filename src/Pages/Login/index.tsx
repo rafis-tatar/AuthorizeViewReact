@@ -4,6 +4,7 @@ import { CSSProperties, FC } from 'react'
 import loginApi from "../../Services/login/loginService"
 import loginType from '../../Services/login/loginType';
 import { useCookies } from 'react-cookie';
+import Title from "antd/es/typography/Title";
 
 const LoginWrapper:FC = ({ children }) => {
   const styleWrapper:CSSProperties = {
@@ -37,7 +38,9 @@ const Login : FC = () => {
       IsDomainAccount: values.isdomain
     }
 
-    const token = await loginApi.login(loginDto).catch(({ response }) => {
+    const token = await loginApi.login(loginDto).catch((e) => {
+      console.log(Object(e).headers)
+      const { response } = e
       message.destroy()
       return message.error(response.data.Error.Message,5)
     });
@@ -61,7 +64,10 @@ const Login : FC = () => {
   return (
     <LoginWrapper>
         <Card style={{ width: "600px",height:"fit-content" }} className="">
-          <Row >
+          <Row>
+            <Col span={24} offset={8}>
+              <h1>Авторизация</h1>
+            </Col>
             <Col span={24}>
               <Form
                 name="basic"
@@ -73,28 +79,28 @@ const Login : FC = () => {
                 autoComplete="off"
               >
                 <Form.Item
-                  label="Username"
+                  label="Логин"
                   name="username"
-                  rules={[{ required: true, message: 'Please input your username!' }]}
+                  rules={[{ required: true, message: 'Пожалуйста, введите ваш логин!' }]}
                 >
                   <Input />
                 </Form.Item>
 
                 <Form.Item
-                  label="Password"
+                  label="Пароль"
                   name="password"
-                  rules={[{ required: true, message: 'Please input your password!' }]}
+                  rules={[{ required: true, message: 'Пожалуйста, введите ваш пароль!' }]}
                 >
                   <Input.Password />
                 </Form.Item>
 
                 <Form.Item name="isdomain" valuePropName="checked" wrapperCol={{ offset: 6 }}>
-                  <Checkbox>Is Domain Account</Checkbox>
+                  <Checkbox defaultChecked={true} checked>Доменная учетная запись</Checkbox>
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ offset: 6 }} >
                   <Button type="primary" htmlType="submit">
-                    Submit
+                    Войти
                   </Button>
                 </Form.Item>
               </Form>

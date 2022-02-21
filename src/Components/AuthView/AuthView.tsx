@@ -1,36 +1,40 @@
-import { ReactElement, useState, FC, useEffect } from "react"
+import {ReactElement, useState, FC, useEffect, ReactChildren} from "react"
 import { withCookies, useCookies } from "react-cookie";
-import IAuthorizedProps from './AuthorizedView';
-import INonAutorizedProps from './NonAutorizedView';
 import jwt_decode, { JwtPayload } from "jwt-decode"
 import loginApi from "../../Services/login/loginService";
+import AuthorizedView from "./AuthorizedView";
+import NonAuthorizedView from "./NonAuthorizedView";
+
+type AuthUser = typeof AuthorizedView;
+type NonAuthUser = typeof NonAuthorizedView;
 
 interface AuthViewProps {
-  children?:
-  | ReactElement<INonAutorizedProps>
-  | Array<ReactElement<INonAutorizedProps>>
-  | ReactElement<typeof IAuthorizedProps>
-  | Array<ReactElement<typeof IAuthorizedProps>>,
-  [name:string]:any
+  // children:
+  //   | ReactElement<INonAutorizedProps>
+  //   | Array<ReactElement<INonAutorizedProps>>
+  //   | ReactElement<typeof IAuthorizedProps>
+  //   | Array<ReactElement<typeof IAuthorizedProps>>,
+  // [name:string]:any
+  children:[ReactElement<AuthUser>,ReactElement<NonAuthUser>]
 }
 
 
 
-const AuthView : FC<AuthViewProps> = ({ children })  => {
+const AuthView : FC<AuthViewProps> = ({children}:AuthViewProps) => {
   
   const [ cookies,setCookies ] = useCookies(["accessToken","refreshToken","userName"])
   const [pending, setPending] = useState(false);
   
-  const [ isAutorizated,setIsAutorizated ] = useState<boolean>(false);
-
-  const autorized = (children as Array<any>).filter(a => a.type.name === 'AutorizedView');
-  const noneAutorized = (children as Array<any>).filter(a => a.type.name === 'NonAutorizedView');
+  const [ isAuthorized,setIsAuthorized ] = useState<boolean>(false);
+  
+  const authorized = (children as Array<any>).filter(a => a.type.name === 'AuthorizedView');
+  const noneAuthorized = (children as Array<any>).filter(a => a.type.name === 'NonAuthorizedView');
 
   const AuthCheck = async () => {
     if(cookies.accessToken){
       const jwtToken : JwtPayload = jwt_decode(cookies?.accessToken)
       if(jwtToken?.exp !== undefined && jwtToken?.exp > Math.floor(new Date().getTime() / 1000)){
-       return setIsAutorizated(true)
+       return setIsAuthorized(true)
       }
     }
     if(cookies.refreshToken){
@@ -42,9 +46,9 @@ const AuthView : FC<AuthViewProps> = ({ children })  => {
             setCookies(value,result[value])
           })
         }
-        return setIsAutorizated(true)
+        return setIsAuthorized(true)
       } catch (error) {
-        return setIsAutorizated(true)
+        return setIsAuthorized(true)
       }
     }
   }
@@ -59,13 +63,13 @@ const AuthView : FC<AuthViewProps> = ({ children })  => {
     }
     insideFunc()
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[cookies.accessToken,isAutorizated])
+  },[cookies.accessToken,isAuthorized])
   
 
   return (
     <div>
       {
-        pending ? !isAutorizated ? autorized : noneAutorized : isAutorizated ? autorized : noneAutorized
+        pending ? !isAuthorized ? authorized : noneAuthorized : isAuthorized ? authorized : noneAuthorized
       }
     </div>
   )

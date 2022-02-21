@@ -6,12 +6,8 @@ interface IAuthorizedProps
     | ReactChild
     | ReactChild[];
 } 
-// interface IAuthorizedState
-// { 
 
-// } 
-
-const AutorizedView : FC<IAuthorizedProps> = ({ children } : IAuthorizedProps) => {
+const AuthorizedView : FC<IAuthorizedProps> = ({ children } : IAuthorizedProps) => {
 
   return (
     <div>
@@ -20,16 +16,7 @@ const AutorizedView : FC<IAuthorizedProps> = ({ children } : IAuthorizedProps) =
   )
 }
 
-// class AutorizedView extends React.Component<IAuthorizedProps,IAuthorizedState> {
-//     constructor(props: IAuthorizedProps) {
-//         super(props);
-//         this.state = {};
-//     }
-//     render() { 
-//         return(<>{this.props.children}</>);
-//     }
-// }
  
 
 
-export default AutorizedView;
+export default AuthorizedView;
