@@ -4,7 +4,7 @@ import { CSSProperties, FC } from 'react'
 import loginApi from "../../Services/login/loginService"
 import loginType from '../../Services/login/loginType';
 import { useCookies } from 'react-cookie';
-import Title from "antd/es/typography/Title";
+import {useNavigate} from "react-router-dom";
 
 const LoginWrapper:FC = ({ children }) => {
   const styleWrapper:CSSProperties = {
@@ -27,7 +27,7 @@ const LoginWrapper:FC = ({ children }) => {
 const Login : FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [cookies,setCookie] = useCookies(["accessToken","refreshToken","userName"])
-
+  const navigate = useNavigate();
   const onFinish = async (values:any) => {
 
     message.loading("Авторизация",0)
@@ -39,7 +39,6 @@ const Login : FC = () => {
     }
 
     const token = await loginApi.login(loginDto).catch((e) => {
-      console.log(Object(e).headers)
       const { response } = e
       message.destroy()
       return message.error(response.data.Error.Message,5)
@@ -48,11 +47,11 @@ const Login : FC = () => {
     if (token.success) {
       const date = new Date();
       date.setDate(date.getHours() + ((60*60*1000)/2))
-      setCookie('accessToken',token.result.accessToken,{ path:"/",expires:date})
+      setCookie('accessToken',token.result.accessToken,{ path:"/",expires:date,httpOnly:true})
       setCookie('refreshToken',token.result.refreshToken,{ path:"/" ,expires:date })
       setCookie('userName',token.result.userName,{ path:"/" ,expires:date })
       //useHistory.BrowserRouter(.).push("/login");
-      window.location.href = '/'
+      document.location.href = "/"
     }
 
   }  

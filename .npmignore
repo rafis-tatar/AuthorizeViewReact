@@ -1,7 +1,7 @@
 src/Pages/First/
 src/Pages/Main
 src/Pages/Second
-src/Routing/routs.tsx
+src/Index/routs.tsx
 src/App.tsx
 src/logo.svg
 src/index.tsx

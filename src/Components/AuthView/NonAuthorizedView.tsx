@@ -11,8 +11,6 @@ interface NonAuthorizedViewState {
 
 }
 
-
-
 class NonAuthorizedView extends React.Component<INonAuthorizedProps, NonAuthorizedViewState> {
   constructor(props: INonAuthorizedProps) {
     super(props);
