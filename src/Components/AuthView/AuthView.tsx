@@ -1,53 +1,80 @@
-import React, { Component, ReactElement } from 'react'
-import IAuthorizedProps from './AuthorizedView';
-import INonAutorizedProps from './NonAutorizedView';
+import {ReactElement, useState, FC, useEffect, ReactChildren} from "react"
+import { withCookies, useCookies } from "react-cookie";
+import jwt_decode, { JwtPayload } from "jwt-decode"
+import loginApi from "../../Services/login/loginService";
+import AuthorizedView from "./AuthorizedView";
+import NonAuthorizedView from "./NonAuthorizedView";
+
+type AuthUser = typeof AuthorizedView;
+type NonAuthUser = typeof NonAuthorizedView;
 
 interface AuthViewProps {
-    children?:
-         | ReactElement<INonAutorizedProps>
-         | Array<ReactElement<INonAutorizedProps>>
-         | ReactElement<IAuthorizedProps>
-         | Array<ReactElement<IAuthorizedProps>>
+  // children:
+  //   | ReactElement<INonAutorizedProps>
+  //   | Array<ReactElement<INonAutorizedProps>>
+  //   | ReactElement<typeof IAuthorizedProps>
+  //   | Array<ReactElement<typeof IAuthorizedProps>>,
+  // [name:string]:any
+  children:[ReactElement<AuthUser>,ReactElement<NonAuthUser>]
 }
- 
-interface AuthViewState {
-    isAutorize:boolean
-}
- 
-class AuthView extends React.Component<AuthViewProps> {
-    constructor(props: AuthViewProps) {
-        super(props);
-        this._isAutorizated = false;
+
+
+
+const AuthView : FC<AuthViewProps> = ({children}:AuthViewProps) => {
+  
+  const [ cookies,setCookies ] = useCookies(["accessToken","refreshToken","userName"])
+  const [pending, setPending] = useState(false);
+  
+  const [ isAuthorized,setIsAuthorized ] = useState<boolean>(false);
+  
+  const authorized = (children as Array<any>).filter(a => a.type.name === 'AuthorizedView');
+  const noneAuthorized = (children as Array<any>).filter(a => a.type.name === 'NonAuthorizedView');
+
+  const AuthCheck = async () => {
+    if(cookies.accessToken){
+      const jwtToken : JwtPayload = jwt_decode(cookies?.accessToken)
+      if(jwtToken?.exp !== undefined && jwtToken?.exp > Math.floor(new Date().getTime() / 1000)){
+       return setIsAuthorized(true)
+      }
     }
-
-private _isAutorizated : boolean;
-public get isAutorizated() : boolean {
-    return this._isAutorizated;
-}
-public set isAutorizated(v : boolean) {
-    this._isAutorizated = v;
-}
-
-       
-    render(): React.ReactNode {
-        var accessToken = localStorage.getItem("accessToken")
-        if (accessToken)
-        {       
-            this.isAutorizated = true;
-        
+    if(cookies.refreshToken){
+      try {
+        const { result,success } = await loginApi.refresh(cookies.refreshToken);
+        if(success){
+          //@ts-ignore
+         return Object.keys(result).forEach((value:"accessToken" | "refreshToken" | "userName") => {
+            setCookies(value,result[value])
+          })
         }
+        return setIsAuthorized(true)
+      } catch (error) {
+        return setIsAuthorized(true)
+      }
+    }
+  }
 
-        const autorized = (this.props.children as Array<any>).filter(a=>a.type.name === 'AutorizedView');
-        const noneAutorized = (this.props.children as Array<any>).filter(a=>a.type.name === 'NonAutorizedView');
+ 
+  
+  useEffect(() => {
+    const insideFunc = async () => {
+      setPending(true)
+      await AuthCheck();
+      return setPending(false)
+    }
+    insideFunc()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[cookies.accessToken,isAuthorized])
+  
 
-        if (this.isAutorizated)
-        {
-            return (<>{autorized}</>);    
-        }
-        else 
-        {
-            return (<>{noneAutorized}</>);    
-        }      
-    }        
-} 
-export default AuthView;
+  return (
+    <div>
+      {
+        pending ? !isAuthorized ? authorized : noneAuthorized : isAuthorized ? authorized : noneAuthorized
+      }
+    </div>
+  )
+  
+}
+
+
+export default withCookies(AuthView);
