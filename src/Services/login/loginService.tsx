@@ -13,36 +13,34 @@ const redirectToHome = () => {
   return document.location.href = '/login'
 }
 
-const AuthCheck = async () => {
-  const [ cookies,setCookies ] = useCookies(["accessToken","refreshToken","userName"])
-  if(cookies.accessToken){
-    const jwtToken : JwtPayload = jwt_decode(cookies?.accessToken)
-      if(jwtToken?.exp === undefined || jwtToken?.exp < Math.floor(new Date().getTime() / 1000)){
-        return redirectToHome()
-      }
-  }
-  if(cookies.refreshToken){
-    try {
-      const { result,success } = await loginApi.refresh(cookies.refreshToken);
-      if(success){
-        //@ts-ignore
-       return Object.keys(result).forEach((value:"accessToken" | "refreshToken" | "userName") => {
-          setCookies(value,result[value])
-        })
-      }
-    } catch (error) {
-      return redirectToHome()
-    }
-  }
-}
+// const AuthCheck = async () => {
+//   const [ cookies,setCookies ] = useCookies(["accessToken","refreshToken","userName"])
+//   if(cookies.accessToken){
+//     const jwtToken : JwtPayload = jwt_decode(cookies?.accessToken)
+//       if(jwtToken?.exp === undefined || jwtToken?.exp < Math.floor(new Date().getTime() / 1000)){
+//         return redirectToHome()
+//       }
+//   }
+//   if(cookies.refreshToken){
+//     try {
+//       const { result,success } = await loginApi.refresh(cookies.refreshToken);
+//       if(success){
+//         //@ts-ignore
+//        return Object.keys(result).forEach((value:"accessToken" | "refreshToken" | "userName") => {
+//           setCookies(value,result[value])
+//         })
+//       }
+//     } catch (error) {
+//       return redirectToHome()
+//     }
+//   }
+// }
 
 instance.interceptors.request.use(
   (config) => {
-    AuthCheck();
     return config;
   },
   (error) => {
-    AuthCheck();
     return Promise.reject(error);
   }
 )
@@ -56,7 +54,7 @@ const requests = {
   delete: (url: string) => instance.delete(url).then(responseBody),
 };
 
-interface IRefreshToken{
+export interface IRefreshToken{
   result:{
     accessToken:string,
     refreshToken:string,
@@ -67,7 +65,7 @@ interface IRefreshToken{
 
 const loginApi = {
   login: (login: loginType): Promise<loginResponse> => requests.post('login', login),
-  validate: (token: string): Promise<Boolean> => requests.get(`tokens/${token}/validate`),
+  validate: (token: string): Promise<boolean> => requests.get(`tokens/${token}/validate`),
   refresh: (refreshToken: string): Promise<IRefreshToken> => requests.get(`tokens/${refreshToken}/refresh`),
   logout: (accessToken: string): Promise<string> => requests.post(`logout/token/${accessToken}`, '')
 };
