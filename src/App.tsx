@@ -7,12 +7,7 @@ import Layout from "./Components/Layout";
 
 function App() {  
     return(
-      <AuthView>
-        <AuthorizedView>
-          <Layout/>
-        </AuthorizedView>
-        <NonAuthorizedView />
-      </AuthView>  
+        <Layout/> 
     )
 }
 

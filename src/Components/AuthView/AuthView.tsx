@@ -15,7 +15,7 @@ interface AuthViewProps {
 
 const AuthView : FC<AuthViewProps> = ({children}:AuthViewProps) => {
   
-  const [ cookies,setCookies ] = useCookies(["accessToken","refreshToken","userName"])
+  const [ cookies,setCookie,removeCookie ] = useCookies(["accessToken","refreshToken","userName"])
 
   const AuthCheck = async ():Promise<boolean> => {
     if(await AuthCheckToken.checkAccessToken(cookies.accessToken)){
@@ -23,23 +23,19 @@ const AuthView : FC<AuthViewProps> = ({children}:AuthViewProps) => {
     }
     try {
       const { accessToken, refreshToken, userName } = await AuthCheckToken.refreshToken(cookies.refreshToken)
-      setCookies("accessToken",accessToken)
-      setCookies("refreshToken",refreshToken)
-      setCookies("userName",userName)
+      setCookie("accessToken",accessToken,{maxAge:60*30,sameSite:"strict",secure:true})
+      setCookie("refreshToken",refreshToken,{maxAge:2592000,sameSite:"strict",secure:true})
+      setCookie("userName",userName,{maxAge:2592000,sameSite:"strict",secure:true})
       return true
     }catch (e){
+      removeCookie("refreshToken")
+      removeCookie("userName")
+      removeCookie("accessToken")
       return false
     }
   }
   
-  
   const [ isAuthorized,setIsAuthorized ] = useState(true);
-  
-  const authorized = (children as Array<any>).filter(a => a.type.name === 'AuthorizedView');
-  const noneAuthorized = (children as Array<any>).filter(a => a.type.name === 'NonAuthorizedView');
-  
-  
-  
   
   useEffect(() => {
    AuthCheck().then(r => setIsAuthorized(r))
@@ -48,7 +44,11 @@ const AuthView : FC<AuthViewProps> = ({children}:AuthViewProps) => {
   return (
     <div>
       {
-        isAuthorized ? authorized : noneAuthorized
+        isAuthorized 
+          ? <AuthorizedView>
+            { children }
+          </AuthorizedView> 
+          : <NonAuthorizedView/>
       }
     </div>
   )
