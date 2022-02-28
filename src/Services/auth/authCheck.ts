@@ -15,6 +15,9 @@ const AuthCheckToken = {
       return newTokens.result;
     }
     throw new Error("Токен обновления либо отсутствует, либо неверный")
+  },
+  validate: async (accessToken:string) => {
+    const valid = await loginApi.validate(accessToken)
   }
 }
 

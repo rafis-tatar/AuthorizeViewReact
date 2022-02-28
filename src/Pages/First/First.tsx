@@ -4,7 +4,7 @@ function First() {
 
     return( 
     <h1>
-        kaif
+        first page
     </h1>);
 }
 export default First;
